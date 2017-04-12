@@ -15,19 +15,19 @@ class SpreeShared::TenantInitializer
   end
 
   def load_seeds
-    Apartment::Tenant.process(db_name) do
+    Apartment::Tenant.switch(db_name) do
       Rake::Task["db:seed"].invoke
     end
   end
 
   def load_spree_sample_data
-    Apartment::Tenant.process(db_name) do
+    Apartment::Tenant.switch(db_name) do
       SpreeSample::Engine.load_samples
     end
   end
 
   def create_admin
-    Apartment::Tenant.process(db_name) do
+    Apartment::Tenant.switch(db_name) do
       password =  "spree123"
       email =  "spree@example.com"
 
@@ -44,7 +44,7 @@ class SpreeShared::TenantInitializer
   end
 
   def load_spree_fancy_sample_data
-    Apartment::Tenant.process(db_name) do
+    Apartment::Tenant.switch(db_name) do
       # load some extra sample data for spree_fancy
       tags      = Spree::Taxonomy.create(:name => 'Tags')
       slider    = Spree::Taxon.create({:taxonomy_id => tags.id, :name => 'Slider'})
@@ -65,7 +65,7 @@ class SpreeShared::TenantInitializer
   end
 
   def fix_sample_payments
-    Apartment::Tenant.process(db_name) do   
+    Apartment::Tenant.switch(db_name) do   
       # create payments based on the totals since they can't be known in YAML (quantities are random)
       method = Spree::PaymentMethod.where(:name => 'Credit Card', :active => true).first
 
@@ -77,7 +77,9 @@ class SpreeShared::TenantInitializer
                                               :name => 'Sean Schofield',
                                               :gateway_customer_profile_id => 'BGS-1234')
       Spree::Order.all.each_with_index do |order, index|
-        order.update!
+        # TODO 
+        #order.update
+        order.save!
         order.payments.delete_all
         payment = order.payments.create!(:amount => order.total, :source => creditcard.clone, :payment_method => method)
         payment.update_columns({
