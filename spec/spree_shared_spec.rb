@@ -25,10 +25,10 @@ describe SpreeShared do
 
   describe 'change tenant by subdomain' do
     it 'uses another database' do
-      expect(Apartment::Tenant.current_tenant).to eq('spree_test')
+      expect(Apartment::Tenant.current).to eq('spree_test')
       code, env = middleware.call env_for('http://tenant271.example.com/')
       expect(code).to eq(200)
-      expect(Apartment::Tenant.current_tenant).to eq('tenant271')
+      expect(Apartment::Tenant.current).to eq('tenant271')
     end
   end
 

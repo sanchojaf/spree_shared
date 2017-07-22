@@ -12,11 +12,11 @@ Spree::Preferences::StoreInstance.class_eval do
       return unless should_persist?
       @loaded_from ||= []
 
-      unless @loaded_from.include? Apartment::Tenant.current_tenant
+      unless @loaded_from.include? Apartment::Tenant.current
         Spree::Preference.all.each do |p|
            @cache.write(p.key, p.value)
         end
-        @loaded_from << Apartment::Tenant.current_tenant
+        @loaded_from << Apartment::Tenant.current
       end
     end
 end
